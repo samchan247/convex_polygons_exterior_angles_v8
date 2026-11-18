@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sum of Exterior Angles of Convex Polygons (9-Slide Interactive Presentation)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      background: #f1f5f9; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif; 
+    }
+    
+    #app-container {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      background: #ffffff;
+      overflow: hidden;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header styling matching presentation */
+    .app-header {
+      padding: 18px 48px;
+      border-bottom: 2px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      z-index: 10;
+    }
+    .app-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: #0f172a;
+    }
+    .progress-pill {
+      background: #f1f5f9;
+      padding: 8px 16px;
+      border-radius: 99px;
+      font-weight: 600;
+      color: #64748b;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Slide container */
+    .slides-wrapper {
+      flex: 1;
+      position: relative;
+    }
+    .slide {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      padding: 24px 48px;
+      display: flex;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(20px);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    /* Content Layouts */
+    .two-col {
+      display: flex;
+      gap: 36px;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+    }
+    .text-col {
+      flex: 1.05;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .visual-col {
+      flex: 1.0;
+      height: 100%;
+      background: #f8fafc;
+      border-radius: 24px;
+      border: 2px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      padding: 12px 14px;
+    }
+
+    /* Graph paper background */
+    .graph-bg {
+      background-color: #fbf9f1;
+      background-image: 
+        linear-gradient(to right, rgba(148, 163, 184, 0.25) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.25) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* Typography */
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 33px;
+      color: #0f172a;
+      margin-bottom: 10px;
+      line-height: 1.18;
+    }
+    .main-text {
+      font-size: 17.5px;
+      color: #334155;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+    .math-blue { color: #0ea5e9; }
+    .math-red { color: #e11d48; }
+    .math-amber { color: #d97706; }
+
+    /* Feature List (for Anatomy slide) */
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .feature-list li {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 11px 15px;
+      font-size: 17.5px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .badge-slate { background: #e2e8f0; color: #0f172a; }
+    .badge-blue { background: #e0f2fe; color: #0369a1; }
+    .badge-amber { background: #fef3c7; color: #b45309; }
+    .badge-red { background: #ffe4e6; color: #be123c; }
+
+    /* Step cards */
+    .step-card {
+      background: #f8fafc;
+      border-left: 5px solid #0ea5e9;
+      border-radius: 0 12px 12px 0;
+      padding: 9px 15px;
+      margin-bottom: 9px;
+      font-size: 16px;
+      color: #1e293b;
+      line-height: 1.4;
+    }
+    .step-card.highlight {
+      background: #fffbeb;
+      border-left-color: #d97706;
+    }
+    .step-title {
+      font-weight: 700;
+      color: #0f172a;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Turn Recorder Panel */
+    .recorder-card {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 11px 15px;
+      margin-top: 2px;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+    }
+    .recorder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+      padding-bottom: 5px;
+      border-bottom: 1.5px solid #f1f5f9;
+    }
+    .recorder-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #475569;
+    }
+    .recorder-total {
+      font-size: 18.5px;
+      font-weight: 700;
+      color: #e11d48;
+      font-variant-numeric: tabular-nums;
+    }
+    .turn-log-grid {
+      display: grid;
+      gap: 6px;
+    }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-5 { grid-template-columns: repeat(5, 1fr); }
+
+    .turn-pill {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 5px 6px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      transition: all 0.2s;
+      font-variant-numeric: tabular-nums;
+    }
+    .turn-pill.compact {
+      padding: 4px 4px;
+      font-size: 11.8px;
+    }
+    .turn-pill.active {
+      background: #fff1f2;
+      border-color: #fda4af;
+      color: #be123c;
+    }
+    .turn-pill.done {
+      background: #ffe4e6;
+      border-color: #e11d48;
+      color: #9f1239;
+    }
+
+    /* Interactive Mini Controls inside visual-col */
+    .mini-toolbar {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1.5px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 6px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+    }
+    .mini-btn {
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .mini-btn:hover { background: #e2e8f0; }
+    .mini-btn.active-blue {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-color: #0284c7;
+    }
+    .mini-btn.active-red {
+      background: #ffe4e6;
+      color: #be123c;
+      border-color: #e11d48;
+    }
+    .mini-btn.accent {
+      background: #0ea5e9;
+      color: #ffffff;
+      border-color: #0284c7;
+    }
+    .mini-btn.accent:hover { background: #0284c7; }
+    .mini-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+
+    .math-text {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    /* Tags */
+    .tag-box {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-family: 'Inter', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+      align-self: flex-start;
+    }
+    .tag-blue {
+      background: #f0f9ff;
+      border: 2px solid #bae6fd;
+      color: #0284c7;
+    }
+    .tag-red {
+      background: #fff1f2;
+      border: 2px solid #fecdd3;
+      color: #be123c;
+    }
+    .tag-amber {
+      background: #fffbeb;
+      border: 2px solid #fde68a;
+      color: #b45309;
+    }
+    .tag-label {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.8;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Animations */
+    @keyframes dash {
+      to { stroke-dashoffset: -20; }
+    }
+    .arrow-path {
+      fill: none;
+      stroke-width: 3.5;
+      stroke-dasharray: 8 6;
+      animation: dash 1s linear infinite;
+    }
+    .arrow-blue { stroke: #0ea5e9; }
+    .arrow-red { stroke: #e11d48; }
+
+    /* Quiz Slide Styles */
+    .quiz-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .quiz-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 8px 18px;
+    }
+    .quiz-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .q-pill {
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .q-pill-num { background: #0f172a; color: #ffffff; }
+    .q-pill-diff-easy { background: #dcfce7; color: #166534; }
+    .q-pill-diff-med { background: #e0f2fe; color: #075985; }
+    .q-pill-diff-hard { background: #fef3c7; color: #92400e; }
+    .q-pill-diff-expert { background: #ffe4e6; color: #9f1239; }
+    .score-hud {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .score-box {
+      background: #ffffff;
+      border: 2px solid #0ea5e9;
+      color: #0284c7;
+      padding: 4px 14px;
+      border-radius: 10px;
+    }
+    .quiz-body {
+      flex: 1;
+      display: flex;
+      gap: 24px;
+      min-height: 0;
+    }
+    .quiz-left {
+      flex: 1.28;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 0;
+    }
+    .quiz-question-text {
+      font-size: 18.5px;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.42;
+      background: #ffffff;
+      border-left: 5px solid #0f172a;
+      padding: 10px 16px;
+      border-radius: 0 12px 12px 0;
+      box-shadow: 0 2px 6px rgba(15,23,42,0.05);
+    }
+    .options-grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .opt-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15.5px;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.25;
+      transition: all 0.16s;
+    }
+    .opt-btn:hover:not(:disabled) {
+      border-color: #0ea5e9;
+      background: #f0f9ff;
+      transform: translateY(-1px);
+    }
+    .opt-btn:disabled { cursor: default; }
+    .opt-letter {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #e2e8f0;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .opt-btn.correct {
+      background: #dcfce7;
+      border-color: #16a34a;
+      color: #14532d;
+    }
+    .opt-btn.correct .opt-letter {
+      background: #16a34a;
+      color: #ffffff;
+    }
+    .opt-btn.wrong {
+      background: #ffe4e6;
+      border-color: #e11d48;
+      color: #881337;
+    }
+    .opt-btn.wrong .opt-letter {
+      background: #e11d48;
+      color: #ffffff;
+    }
+    .quiz-feedback {
+      min-height: 68px;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 14px;
+      line-height: 1.35;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      color: #334155;
+    }
+    .quiz-feedback.fb-correct {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: #14532d;
+    }
+    .quiz-feedback.fb-wrong {
+      background: #fff1f2;
+      border-color: #fda4af;
+      color: #881337;
+    }
+    .quiz-right {
+      flex: 0.78;
+      background-color: #fbf9f1;
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+      background-size: 24px 24px;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Navigation Controls */
+    .controls {
+      padding: 14px 48px;
+      border-top: 2px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      z-index: 10;
+    }
+    .nav-btn {
+      padding: 10px 22px;
+      font-size: 15.5px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-prev {
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .btn-prev:hover:not(:disabled) { background: #e2e8f0; color: #0f172a; }
+    .btn-prev:disabled { opacity: 0.4; cursor: not-allowed; }
+    
+    .btn-next {
+      background: #0f172a;
+      color: #ffffff;
+    }
+    .btn-next:hover:not(:disabled) { background: #334155; box-shadow: 0 4px 12px rgba(15,23,42,0.3); }
+    .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .slide-tabs {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+    .tab-pill {
+      padding: 5px 9px;
+      border-radius: 99px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-pill:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .tab-pill.active {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Reusable SVG Definitions for Arrowheads -->
+  <svg width="0" height="0" style="position:absolute;">
+    <defs>
+      <marker id="arrowhead-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#0284c7" />
+      </marker>
+      <marker id="arrowhead-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#e11d48" />
+      </marker>
+    </defs>
+  </svg>
+
+  <div id="app-container">
+    <div class="app-header">
+      <h1>Exterior Angle Sum of Convex Polygons (<em>n</em> = 3, 4, 5, 10)</h1>
+      <div class="progress-pill" id="slide-tracker">Slide 1 of 9 &bull; Anatomy of a Convex Polygon</div>
+    </div>
+
+    <div class="slides-wrapper" id="slides-wrapper">
+      <!-- SLIDE 1 (Added from v20): Anatomy of an n-Sided Convex Polygon -->
+      <div class="slide active" id="slide-0">
+        <div class="two-col">
+          <div class="text-col">
+            <h2>1. Anatomy of a Convex Polygon</h2>
+            <p class="main-text">An <strong><em>n</em>-sided convex polygon</strong> is a closed figure with <em>n</em> straight sides where every interior angle is strictly less than <strong>180&deg;</strong>.</p>
+            <ul class="feature-list">
+              <li>
+                <span class="badge badge-slate">Convexity</span>
+                <span>All vertices point outward; every diagonal lies completely inside</span>
+              </li>
+              <li>
+                <span class="badge badge-blue">Interior &angle; (<em>i</em>)</span>
+                <span>Angle formed inside the polygon by two adjacent sides</span>
+              </li>
+              <li>
+                <span class="badge badge-red">Exterior &angle; (<em>e</em>)</span>
+                <span>Angle between one side and the extension of its adjacent side (<strong><em>i</em> + <em>e</em> = 180&deg;</strong>)</span>
+              </li>
+              <li>
+                <span class="badge badge-amber">Sides &amp; Vertices</span>
+                <span><strong><em>n</em></strong> straight sides, <strong><em>n</em></strong> interior angles, and <strong><em>n</em></strong> exterior angles</span>
+              </li>
+            </ul>
+          </div>
+          <div class="visual-col graph-bg">
+            <svg width="100%" height="100%" viewBox="0 0 460 420">
+              <!-- Irregular Convex Pentagon ABCDE -->
+              <polygon points="215,55 368,145 318,312 138,312 92,168" fill="rgba(255,255,255,0.8)" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+              <text x="225" y="198" text-anchor="middle" font-weight="700" font-size="16" fill="#334155">Irregular Pentagon (n = 5)</text>
+
+              <!-- Extended base DC to show single pair of adjacent i and e at C -->
+              <line x1="318" y1="312" x2="415" y2="312" stroke="#e11d48" stroke-width="3.5" stroke-dasharray="6 4"/>
+
+              <!-- Interior angle arc at C -->
+              <path d="M 330,272 A 42,42 0 0,0 276,312" fill="none" stroke="#0ea5e9" stroke-width="3.8"/>
+              <text x="262" y="274" text-anchor="middle" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="23" fill="#0284c7">i</text>
+
+              <!-- Exterior angle arc at C -->
+              <path d="M 360,312 A 42,42 0 0,0 330,272" fill="none" stroke="#e11d48" stroke-width="3.8"/>
+              <text x="372" y="286" text-anchor="middle" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="23" fill="#e11d48">e</text>
+
+              <!-- Vertex Labels -->
+              <text x="215" y="38" text-anchor="middle" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="21" fill="#0f172a">A</text>
+              <text x="386" y="148" text-anchor="start" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="21" fill="#0f172a">B</text>
+              <text x="318" y="340" text-anchor="middle" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="21" fill="#0f172a">C</text>
+              <text x="138" y="340" text-anchor="middle" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="21" fill="#0f172a">D</text>
+              <text x="72" y="172" text-anchor="end" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="21" fill="#0f172a">E</text>
+
+              <!-- Extra-Long Full-Width Summary Box -->
+              <rect x="8" y="358" width="444" height="46" rx="10" fill="#ffffff" stroke="#0f172a" stroke-width="2.2"/>
+              <text x="230" y="386" text-anchor="middle" font-weight="700" font-size="15.5" fill="#0f172a">Adjacent Pair at Vertex C: &nbsp;i + e = 180&deg; (adj. &angle;s on st. line)</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <!-- Slides 2..9 are injected dynamically below -->
+    </div>
+
+    <div class="controls">
+      <button class="nav-btn btn-prev" id="btn-prev" onclick="navigate(-1)" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Previous
+      </button>
+
+      <div class="slide-tabs" id="slide-tabs">
+        <button class="tab-pill active" onclick="goToSlide(0)">1. Anatomy</button>
+        <button class="tab-pill" onclick="goToSlide(1)">2. Triangle</button>
+        <button class="tab-pill" onclick="goToSlide(2)">3. Quad</button>
+        <button class="tab-pill" onclick="goToSlide(3)">4. Pentagon</button>
+        <button class="tab-pill" onclick="goToSlide(4)">5. Decagon</button>
+        <button class="tab-pill" onclick="goToSlide(5)">6. Circle vs 5-gon</button>
+        <button class="tab-pill" onclick="goToSlide(6)">7. Shrink Proof</button>
+        <button class="tab-pill" onclick="goToSlide(7)">8. Ext. Sum = 360&deg;</button>
+        <button class="tab-pill" onclick="goToSlide(8)">9. Checkpoint</button>
+      </div>
+
+      <button class="nav-btn btn-next" id="btn-next" onclick="navigate(1)">
+        Next
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const SUBSCRIPTS = ['₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉', '₁₀'];
+    const VERTEX_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
+    function makeDecagonPreset(variant) {
+      const cx = 230, cy = 165;
+      const baseR = 112;
+      const scalesList = [
+        [1.02, 0.94, 1.05, 0.92, 1.00, 1.04, 0.93, 1.03, 0.95, 0.98],
+        [0.95, 1.04, 0.96, 1.03, 0.92, 1.05, 0.97, 1.01, 0.94, 1.02],
+        [1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00]
+      ];
+      const scales = scalesList[variant % scalesList.length];
+      const pts = [];
+      for (let i = 0; i < 10; i++) {
+        const ang = -Math.PI / 2 + (2 * Math.PI * i) / 10;
+        const r = baseR * scales[i];
+        pts.push({
+          x: cx + r * Math.cos(ang),
+          y: cy + r * Math.sin(ang),
+          name: VERTEX_NAMES[i]
+        });
+      }
+      return pts;
+    }
+
+    const SLIDE_CONFIGS = [
+      {
+        id: 'tri',
+        n: 3,
+        shortName: 'Triangle',
+        symbol: '△ABC',
+        title: '2. Exterior Angle Sum of a Triangle (n = 3)',
+        desc: 'Move point <strong><em>P</em></strong> one complete cycle around <strong>&Delta;<em>ABC</em></strong> (or drag vertices <em>A, B, C</em> to reshape the triangle).',
+        gridClass: 'grid-3',
+        compactPills: false,
+        presets: [
+          [{ x: 185, y: 66, name: 'A' }, { x: 355, y: 245, name: 'B' }, { x: 105, y: 268, name: 'C' }],
+          [{ x: 255, y: 62, name: 'A' }, { x: 365, y: 258, name: 'B' }, { x: 95, y: 225, name: 'C' }],
+          [{ x: 130, y: 72, name: 'A' }, { x: 372, y: 195, name: 'B' }, { x: 155, y: 274, name: 'C' }]
+        ]
+      },
+      {
+        id: 'quad',
+        n: 4,
+        shortName: 'Quadrilateral',
+        symbol: 'quadrilateral ABCD',
+        title: '3. Exterior Angle Sum of a Convex Quadrilateral (n = 4)',
+        desc: 'Move point <strong><em>P</em></strong> one complete cycle around convex <strong><em>ABCD</em></strong> (or drag vertices <em>A–D</em> to reshape it).',
+        gridClass: 'grid-4',
+        compactPills: false,
+        presets: [
+          [{ x: 145, y: 68, name: 'A' }, { x: 335, y: 84, name: 'B' }, { x: 362, y: 254, name: 'C' }, { x: 108, y: 242, name: 'D' }],
+          [{ x: 205, y: 58, name: 'A' }, { x: 368, y: 148, name: 'B' }, { x: 295, y: 268, name: 'C' }, { x: 102, y: 220, name: 'D' }],
+          [{ x: 125, y: 80, name: 'A' }, { x: 318, y: 64, name: 'B' }, { x: 354, y: 238, name: 'C' }, { x: 132, y: 264, name: 'D' }]
+        ]
+      },
+      {
+        id: 'pent',
+        n: 5,
+        shortName: 'Pentagon',
+        symbol: 'pentagon ABCDE',
+        title: '4. Exterior Angle Sum of a Convex Pentagon (n = 5)',
+        desc: 'Move point <strong><em>P</em></strong> one complete cycle around convex <strong><em>ABCDE</em></strong> (or drag vertices <em>A–E</em> to reshape it).',
+        gridClass: 'grid-5',
+        compactPills: true,
+        presets: [
+          [{ x: 225, y: 56, name: 'A' }, { x: 358, y: 138, name: 'B' }, { x: 312, y: 266, name: 'C' }, { x: 138, y: 262, name: 'D' }, { x: 96, y: 142, name: 'E' }],
+          [{ x: 185, y: 58, name: 'A' }, { x: 348, y: 112, name: 'B' }, { x: 332, y: 254, name: 'C' }, { x: 165, y: 270, name: 'D' }, { x: 92, y: 168, name: 'E' }],
+          [{ x: 245, y: 58, name: 'A' }, { x: 364, y: 162, name: 'B' }, { x: 288, y: 268, name: 'C' }, { x: 122, y: 248, name: 'D' }, { x: 104, y: 118, name: 'E' }]
+        ]
+      },
+      {
+        id: 'dec',
+        n: 10,
+        shortName: 'Decagon',
+        symbol: 'decagon ABCDEFGHIJ',
+        title: '5. Exterior Angle Sum of a Convex Decagon (n = 10)',
+        desc: 'Move point <strong><em>P</em></strong> one complete cycle around convex <strong>10-gon</strong> (or drag any vertex <em>A–J</em> to reshape it).',
+        gridClass: 'grid-5',
+        compactPills: true,
+        presets: [
+          makeDecagonPreset(0),
+          makeDecagonPreset(1),
+          makeDecagonPreset(2)
+        ]
+      }
+    ];
+
+    // Append Slides 2..5 (indices 1..4) after Slide 1 (index 0)
+    const slidesWrapper = document.getElementById('slides-wrapper');
+    const polygonSlidesHTML = SLIDE_CONFIGS.map((cfg, cfgIdx) => {
+      const slideDomIdx = cfgIdx + 1;
+      const n = cfg.n;
+      const pillsHTML = Array.from({ length: n }, (_, k) => {
+        const vTarget = VERTEX_NAMES[(k + 1) % n];
+        const sub = SUBSCRIPTS[k];
+        return `<div class="turn-pill ${cfg.compactPills ? 'compact' : ''}" id="${cfg.id}-pill-${k}">${vTarget} (<em>e</em>${sub}): <span id="${cfg.id}-val-${k}">0&deg;</span></div>`;
+      }).join('');
+
+      const eqTerms = Array.from({ length: n }, (_, k) => `<span id="${cfg.id}-eq-${k}">0&deg;</span>`).join(' + ');
+      const eqHeader = n <= 5
+        ? Array.from({ length: n }, (_, k) => `e${SUBSCRIPTS[k]}`).join(' + ')
+        : `e₁ + e₂ + … + e₁₀`;
+
+      return `
+      <div class="slide" id="slide-${slideDomIdx}">
+        <div class="two-col">
+          <!-- LEFT COLUMN -->
+          <div class="text-col">
+            <h2>${cfg.title}</h2>
+            <p class="main-text">${cfg.desc}</p>
+            
+            <div class="step-card">
+              <span class="step-title">1. Straight Edges vs. Corner Turns</span>
+              Along each side, <em>P</em> moves straight without turning. At each of the <strong>${n} vertices</strong>, <em>P</em> pivots through exterior angle <strong><em>e<sub>k</sub></em> = 180&deg; &minus; <em>i<sub>k</sub></em></strong>.
+            </div>
+
+            <div class="step-card highlight">
+              <span class="step-title">2. Full Cycle = One Complete Turn</span>
+              Returning to its starting direction after 1 full cycle means all <strong>${n} exterior turns</strong> sum to <strong class="math-red">${eqHeader} = 360&deg;</strong>.
+            </div>
+
+            <!-- Live Turn Recorder -->
+            <div class="recorder-card">
+              <div class="recorder-header" id="${cfg.id}-rec-header" style="margin-bottom:0; padding-bottom:0; border-bottom:none;">
+                <span class="recorder-title">Recorded Exterior Turns (n = ${n})</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="recorder-total" id="${cfg.id}-rec-total" style="display:none;">Total Turn: 0&deg; / 360&deg;</span>
+                  <button class="mini-btn" id="${cfg.id}-btn-rec" onclick="toggleTurnRecorder(${cfgIdx})" style="padding:3px 9px; font-size:12px;">Show Record</button>
+                </div>
+              </div>
+              <div id="${cfg.id}-rec-body" style="display:none;">
+                <div class="turn-log-grid ${cfg.gridClass}">
+                  ${pillsHTML}
+                </div>
+                <div style="margin-top:7px; font-size:${n === 10 ? '12px' : '13.5px'}; color:#334155; text-align:center; font-weight:600; line-height:1.35;">
+                  ${eqHeader} = ${eqTerms} = <span style="color:#e11d48;" id="${cfg.id}-eq-sum">0&deg;</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="visual-col graph-bg">
+            <div class="mini-toolbar" style="margin-top: 0; margin-bottom: 6px;">
+              <div style="display:flex; gap:6px; align-items:center;">
+                <button class="mini-btn active-blue" id="${cfg.id}-btn-int" onclick="toggleInterior(${cfgIdx})">Hide Interior &angle;s (<em>i</em>)</button>
+                <button class="mini-btn active-red" id="${cfg.id}-btn-ext" onclick="toggleExterior(${cfgIdx})">Hide Exterior &angle;s (<em>e</em>)</button>
+              </div>
+              <button class="mini-btn" onclick="randomizePolygon(${cfgIdx})" title="Generate a new convex ${cfg.shortName.toLowerCase()}">New ${cfg.shortName} &#8635;</button>
+            </div>
+
+            <svg id="${cfg.id}-svg" width="100%" height="365" viewBox="0 0 460 365" style="touch-action: none;">
+              <g id="${cfg.id}-ext-rays"></g>
+              <g id="${cfg.id}-ext-angles"></g>
+              <g id="${cfg.id}-int-angles"></g>
+              <polygon id="${cfg.id}-poly" fill="rgba(255,255,255,0.65)" stroke="#0f172a" stroke-width="${n === 10 ? '3.0' : '3.6'}" stroke-linejoin="round"/>
+              <g id="${cfg.id}-vertices"></g>
+              <g id="${cfg.id}-point-P" style="cursor: grab;">
+                <circle cx="0" cy="0" r="18" fill="rgba(225,29,72,0.15)"/>
+                <line x1="0" y1="0" x2="50" y2="0" stroke="#e11d48" stroke-width="3.5" marker-end="url(#arrowhead-red)"/>
+                <circle cx="0" cy="0" r="7" fill="#e11d48" stroke="#ffffff" stroke-width="2"/>
+                <text x="10" y="-11" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="19" fill="#be123c">P</text>
+              </g>
+              <rect x="20" y="325" width="420" height="32" rx="8" fill="rgba(255,255,255,0.95)" stroke="#0f172a" stroke-width="1.8"/>
+              <text id="${cfg.id}-status" x="230" y="346" text-anchor="middle" font-weight="700" font-size="13.5" fill="#0f172a">Drag P along the sides or drag vertices to reshape</text>
+            </svg>
+
+            <div class="mini-toolbar">
+              <label style="font-size:12.5px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:6px; flex:1;">
+                Cycle:
+                <input type="range" id="${cfg.id}-slider" min="0" max="1000" value="0" style="flex:1; accent-color:#e11d48; cursor:pointer;" oninput="onCycleSlider(${cfgIdx}, this.value)">
+                <span id="${cfg.id}-pct" style="min-width:38px; text-align:right;">0%</span>
+              </label>
+              <button class="mini-btn accent" id="${cfg.id}-btn-play" onclick="togglePlay(${cfgIdx})">Pause</button>
+              <button class="mini-btn" onclick="resetCycle(${cfgIdx})">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    slidesWrapper.insertAdjacentHTML('beforeend', polygonSlidesHTML);
+
+    slidesWrapper.insertAdjacentHTML('beforeend', `
+      <!-- SLIDE 6 (index 5): Dynamic Turning Investigation — Moving Point A on Circle vs Pentagon -->
+      <div class="slide" id="slide-5">
+        <div class="two-col">
+          <div class="text-col">
+            <h2>6. Exterior Turn Investigation:<br><span style="font-size:27px; color:#e11d48;">Circle vs. Pentagon</span></h2>
+            <p class="main-text">Watch point <strong><em>A</em></strong> travel once around each closed path and track how its heading arrow turns:</p>
+            <div class="step-card">
+              <span class="step-title">Left: Moving Point <em>A</em> on a Circle</span>
+              As <em>A</em> moves smoothly around the circle, its tangent arrow rotates continuously through <strong>360&deg;</strong> to return to its starting direction.
+            </div>
+            <div class="step-card highlight">
+              <span class="step-title">Right: Moving Point <em>A</em> Along a Pentagon</span>
+              Along straight edges the heading stays constant; at each corner, <em>A</em> pivots by exterior angle <em>e<sub>k</sub></em>, summing to <strong class="math-red"><em>e</em><sub>1</sub> + <em>e</em><sub>2</sub> + <em>e</em><sub>3</sub> + <em>e</em><sub>4</sub> + <em>e</em><sub>5</sub> = 360&deg;</strong>.
+            </div>
+          </div>
+
+          <div class="visual-col graph-bg">
+            <svg id="svg-turn" width="100%" height="340" viewBox="0 0 460 340" style="touch-action: none;">
+              <!-- Divider -->
+              <line x1="225" y1="20" x2="225" y2="285" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 6"/>
+
+              <!-- LEFT: CIRCLE WITH MOVING POINT A & TANGENT ARROW -->
+              <text x="112" y="28" text-anchor="middle" font-weight="700" font-size="15" fill="#0f172a">Circle (Continuous Turn)</text>
+              <circle id="turn-circle-track" cx="112" cy="148" r="68" fill="rgba(255,255,255,0.85)" stroke="#0f172a" stroke-width="3.2"/>
+              <path id="turn-circle-arc" fill="rgba(225,29,72,0.18)" stroke="#e11d48" stroke-width="2.5"/>
+              <line x1="112" y1="148" x2="112" y2="80" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>
+              <g id="turn-circle-a" style="cursor: grab;">
+                <circle cx="0" cy="0" r="18" fill="rgba(225,29,72,0.14)" class="drag-halo"/>
+                <line x1="0" y1="0" x2="48" y2="0" stroke="#e11d48" stroke-width="3.5" marker-end="url(#arrowhead-red)"/>
+                <circle cx="0" cy="0" r="7" fill="#e11d48" stroke="#ffffff" stroke-width="2"/>
+                <text x="-12" y="-12" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="18" fill="#be123c">A</text>
+              </g>
+              <text id="turn-circle-readout" x="112" y="266" text-anchor="middle" font-weight="700" font-size="14.5" fill="#e11d48">Turned: 0&deg; / 360&deg;</text>
+
+              <!-- RIGHT: PENTAGON WITH MOVING POINT A & HEADING ARROW -->
+              <text x="342" y="28" text-anchor="middle" font-weight="700" font-size="15" fill="#0f172a">Pentagon (Corner Turns)</text>
+              <g id="turn-pent-wedges"></g>
+              <polygon id="turn-pent-poly" fill="rgba(255,255,255,0.85)" stroke="#0f172a" stroke-width="3.2" stroke-linejoin="round"/>
+              <g id="turn-pent-rays"></g>
+              <g id="turn-pent-a" style="cursor: grab;">
+                <circle cx="0" cy="0" r="18" fill="rgba(2,132,199,0.16)" class="drag-halo"/>
+                <line x1="0" y1="0" x2="48" y2="0" stroke="#0284c7" stroke-width="3.5" marker-end="url(#arrowhead-blue)"/>
+                <circle cx="0" cy="0" r="7" fill="#0284c7" stroke="#ffffff" stroke-width="2"/>
+                <text x="10" y="-11" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="18" fill="#0369a1">A</text>
+              </g>
+              <text id="turn-pent-readout" x="342" y="266" text-anchor="middle" font-weight="700" font-size="14.5" fill="#0284c7">Exterior Turn: 0&deg; / 360&deg;</text>
+
+              <!-- Bottom Status Bar -->
+              <rect x="25" y="296" width="410" height="34" rx="8" fill="rgba(255,255,255,0.95)" stroke="#0f172a" stroke-width="1.8"/>
+              <text id="turn-status" x="230" y="318" text-anchor="middle" font-weight="700" font-size="14" fill="#0f172a">Auto mode — or select "Drag by Hand" to pull Point A</text>
+            </svg>
+
+            <div class="mini-toolbar" style="flex-wrap: wrap;">
+              <div style="display:flex; gap:5px; align-items:center;">
+                <button class="mini-btn active" id="turn-mode-auto" onclick="setTurnMode('auto')">Auto / Slider</button>
+                <button class="mini-btn" id="turn-mode-hand" onclick="setTurnMode('hand')">Drag by Hand</button>
+              </div>
+              <label style="font-size:12.5px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:6px; flex:1; min-width:140px;">
+                <input type="range" id="turn-slider" min="0" max="100" value="0" style="flex:1; accent-color:#0284c7; cursor:pointer;" oninput="onTurnSlider(this.value)">
+                <span id="turn-pct" style="min-width:36px; text-align:right;">0%</span>
+              </label>
+              <div style="display:flex; gap:5px;">
+                <button class="mini-btn accent" id="turn-play-btn" onclick="toggleTurnAnim()">Pause</button>
+                <button class="mini-btn" onclick="resetTurnAnim()">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 7 (index 6): Dynamic Visual Proof — Shrinking Polygon to a Point -->
+      <div class="slide" id="slide-6">
+        <div class="two-col">
+          <div class="text-col">
+            <h2>7. Visual Proof: Shrinking to a Point</h2>
+            <p class="main-text">Imagine zooming out—or contracting all sides toward a central point <strong><em>P</em></strong> while keeping side directions unchanged.</p>
+            <div class="step-card">
+              <span class="step-title">1. Parallel Edge Contraction</span>
+              As the polygon shrinks, each exterior angle wedge (<em>e</em><sub>1</sub> to <em>e</em><sub>5</sub>) keeps its exact angle measure.
+            </div>
+            <div class="step-card highlight">
+              <span class="step-title">2. Angles Around a Point = 360&deg;</span>
+              When the polygon collapses to point <strong><em>P</em></strong>, the exterior angles meet around <em>P</em> to form a complete <strong class="math-red">360&deg;</strong> circle.
+            </div>
+            <div class="tag-box tag-red">
+              <span class="tag-label">Geometric Insight</span>
+              &angle;s at a pt. = 360&deg; &rArr; sum of ext. &angle;s = 360&deg;
+            </div>
+          </div>
+          <div class="visual-col graph-bg">
+            <svg id="svg-shrink" width="100%" height="340" viewBox="0 0 420 340">
+              <g id="shrink-wedges"></g>
+              <g id="shrink-rays"></g>
+              <polygon id="shrink-poly" fill="rgba(255,255,255,0.88)" stroke="#0f172a" stroke-width="3.5" stroke-linejoin="round"/>
+              <circle cx="210" cy="170" r="5" fill="#0f172a"/>
+              <text id="shrink-p-label" x="210" y="156" text-anchor="middle" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="20" fill="#0f172a">P</text>
+              <rect x="65" y="298" width="290" height="34" rx="8" fill="rgba(255,255,255,0.92)" stroke="#0f172a" stroke-width="1.8"/>
+              <text id="shrink-status" x="210" y="320" text-anchor="middle" font-weight="700" font-size="15" fill="#e11d48">Contraction: 0% — Exterior wedges separated</text>
+            </svg>
+            <div class="mini-toolbar">
+              <label style="font-size:13px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px; flex:1;">
+                Shrink:
+                <input type="range" id="shrink-slider" min="0" max="100" value="0" style="flex:1; accent-color:#e11d48; cursor:pointer;" oninput="onShrinkSlider(this.value)">
+                <span id="shrink-pct" style="min-width:38px; text-align:right;">0%</span>
+              </label>
+              <button class="mini-btn accent" id="shrink-play-btn" onclick="toggleShrinkAnim()">Pause</button>
+              <button class="mini-btn" onclick="resetShrinkAnim()">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 8 (index 7): Exterior Angle Sum = 360° -->
+      <div class="slide" id="slide-7">
+        <div class="two-col">
+          <div class="text-col">
+            <h2>8. Sum of Exterior Angles = 360&deg;</h2>
+            <p class="main-text">When one side at each vertex of any convex polygon is extended in the same cyclic direction, the sum of the exterior angles (<strong><em>e</em></strong>) is always <strong>360&deg;</strong>.</p>
+            <p class="math-text math-red">Sum of exterior &angle;s: <em>e</em><sub>1</sub> + <em>e</em><sub>2</sub> + &hellip; + <em>e<sub>n</sub></em> = 360&deg;</p>
+            <div class="step-card">
+              <span class="step-title">Algebraic Proof (using <em>i</em> + <em>e</em> = 180&deg;)</span>
+              Sum of all pairs: (<em>i</em><sub>1</sub> + <em>e</em><sub>1</sub>) + &hellip; + (<em>i<sub>n</sub></em> + <em>e<sub>n</sub></em>) = <em>n</em> &times; 180&deg;<br>
+              Sum of interior &angle;s: <em>i</em><sub>1</sub> + &hellip; + <em>i<sub>n</sub></em> = (<em>n</em> &minus; 2) &times; 180&deg;<br>
+              Exterior sum (<em>e</em><sub>1</sub> + &hellip; + <em>e<sub>n</sub></em>) = <em>n</em> &times; 180&deg; &minus; (<em>n</em> &minus; 2) &times; 180&deg; = <strong class="math-red">360&deg;</strong>
+            </div>
+            <div class="tag-box tag-red">
+              <span class="tag-label">Geometric Proof Abbreviation</span>
+              sum of ext. &angle;s of polygon
+            </div>
+          </div>
+          <div class="visual-col">
+            <svg width="100%" height="100%" viewBox="0 0 420 420">
+              <polygon points="210,85 325,168 281,305 139,305 95,168" fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+              
+              <!-- Extended rays in clockwise order -->
+              <line x1="210" y1="85" x2="295" y2="24" class="arrow-path arrow-red" marker-end="url(#arrowhead-red)"/>
+              <line x1="325" y1="168" x2="405" y2="226" class="arrow-path arrow-red" marker-end="url(#arrowhead-red)"/>
+              <line x1="281" y1="305" x2="250" y2="400" class="arrow-path arrow-red" marker-end="url(#arrowhead-red)"/>
+              <line x1="139" y1="305" x2="40" y2="305" class="arrow-path arrow-red" marker-end="url(#arrowhead-red)"/>
+              <line x1="95" y1="168" x2="64" y2="74" class="arrow-path arrow-red" marker-end="url(#arrowhead-red)"/>
+
+              <!-- Exterior Angle Arcs -->
+              <path d="M 244,61 A 42,42 0 0,1 244,110" fill="none" stroke="#e11d48" stroke-width="4"/>
+              <text x="266" y="78" font-weight="700" font-size="18" fill="#e11d48">e&#8321;</text>
+
+              <path d="M 358,192 A 42,42 0 0,1 312,208" fill="none" stroke="#e11d48" stroke-width="4"/>
+              <text x="352" y="226" font-weight="700" font-size="18" fill="#e11d48">e&#8322;</text>
+
+              <path d="M 268,345 A 42,42 0 0,1 239,305" fill="none" stroke="#e11d48" stroke-width="4"/>
+              <text x="234" y="346" font-weight="700" font-size="18" fill="#e11d48">e&#8323;</text>
+
+              <path d="M 97,305 A 42,42 0 0,1 126,265" fill="none" stroke="#e11d48" stroke-width="4"/>
+              <text x="86" y="280" font-weight="700" font-size="18" fill="#e11d48">e&#8324;</text>
+
+              <path d="M 82,128 A 42,42 0 0,1 129,144" fill="none" stroke="#e11d48" stroke-width="4"/>
+              <text x="108" y="116" font-weight="700" font-size="18" fill="#e11d48">e&#8325;</text>
+
+              <text x="210" y="202" text-anchor="middle" font-weight="700" font-size="20" fill="#0f172a">1 Full Turn</text>
+              <text x="210" y="228" text-anchor="middle" font-weight="700" font-size="22" fill="#e11d48">= 360&deg;</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 9 (index 8): Exterior Angles Checkpoint Quiz -->
+      <div class="slide" id="slide-8">
+        <div class="quiz-container">
+          <div class="quiz-topbar">
+            <div class="quiz-badges">
+              <span class="q-pill q-pill-num" id="extq-counter">Question 1 / 6</span>
+              <span class="q-pill q-pill-diff-easy" id="extq-diff-badge">Step 1: Core Concept</span>
+              <span style="font-size:13.5px; color:#475569; font-weight:600;" id="extq-topic-tag">Assessment for Learning &bull; i &amp; e</span>
+            </div>
+            <div class="score-hud">
+              <div class="score-box" id="extq-score-display">Checkpoint Score: 0 / 6</div>
+              <button class="mini-btn" onclick="resetMiniQuiz('extq')">Restart Quiz &#8635;</button>
+            </div>
+          </div>
+
+          <div class="quiz-body">
+            <div class="quiz-left">
+              <div class="quiz-question-text" id="extq-prompt">Loading...</div>
+
+              <div class="options-grid-2x2">
+                <button class="opt-btn" id="extq-opt-0" onclick="selectMiniOption('extq', 0)"><span class="opt-letter">A</span><span id="extq-opt-text-0"></span></button>
+                <button class="opt-btn" id="extq-opt-1" onclick="selectMiniOption('extq', 1)"><span class="opt-letter">B</span><span id="extq-opt-text-1"></span></button>
+                <button class="opt-btn" id="extq-opt-2" onclick="selectMiniOption('extq', 2)"><span class="opt-letter">C</span><span id="extq-opt-text-2"></span></button>
+                <button class="opt-btn" id="extq-opt-3" onclick="selectMiniOption('extq', 3)"><span class="opt-letter">D</span><span id="extq-opt-text-3"></span></button>
+              </div>
+
+              <div class="quiz-feedback" id="extq-feedback">
+                <div id="extq-feedback-text">Select option <strong>A, B, C, or D</strong> above to check your understanding and view the step-by-step explanation.</div>
+                <div style="display:flex; gap:8px; flex-shrink:0;">
+                  <button class="mini-btn" id="extq-prev-btn" onclick="stepMiniQuiz('extq', -1)" disabled>&larr; Prev</button>
+                  <button class="mini-btn accent" id="extq-next-btn" onclick="stepMiniQuiz('extq', 1)" disabled>Next &rarr;</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="quiz-right">
+              <svg id="extq-svg" width="100%" height="100%" viewBox="0 0 360 320"></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    `);
+
+
+    // State per polygon slide (indices 1..4 correspond to SLIDE_CONFIGS[0..3])
+    const slideStates = SLIDE_CONFIGS.map(cfg => ({
+      cfg,
+      verts: cfg.presets[0].map(v => ({ ...v })),
+      presetIdx: 0,
+      showInt: true,
+      showExt: true,
+      showRecorder: false,
+      cycleT: 0,
+      isPlaying: true,
+      pauseFrames: 0,
+      dragMode: null
+    }));
+
+    let currentSlide = 0;
+
+    function isStrictlyConvex(pts) {
+      const n = pts.length;
+      let sign = 0;
+      for (let i = 0; i < n; i++) {
+        const a = pts[i];
+        const b = pts[(i + 1) % n];
+        const c = pts[(i + 2) % n];
+        const cross = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+        if (Math.abs(cross) < 40) return false;
+        const s = cross > 0 ? 1 : -1;
+        if (sign === 0) sign = s;
+        else if (sign !== s) return false;
+      }
+      return sign > 0; // clockwise in screen coordinates (y-down)
+    }
+
+    function computeGeometry(st) {
+      const n = st.cfg.n;
+      const edges = [];
+      for (let i = 0; i < n; i++) {
+        const p1 = st.verts[i];
+        const p2 = st.verts[(i + 1) % n];
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        edges.push({
+          from: p1,
+          to: p2,
+          len: Math.hypot(dx, dy),
+          ang: Math.atan2(dy, dx)
+        });
+      }
+
+      const turns = [];
+      for (let i = 0; i < n; i++) {
+        const eIn = edges[i];
+        const eOut = edges[(i + 1) % n];
+        let diff = eOut.ang - eIn.ang;
+        while (diff <= 0) diff += Math.PI * 2;
+        while (diff > Math.PI * 2) diff -= Math.PI * 2;
+        const extDeg = (diff * 180) / Math.PI;
+        turns.push({
+          vertex: eIn.to,
+          inAng: eIn.ang,
+          outAng: eOut.ang,
+          extRad: diff,
+          extDeg
+        });
+      }
+      return { edges, turns };
+    }
+
+    function renderSlide(cfgIdx) {
+      const st = slideStates[cfgIdx];
+      const cfg = st.cfg;
+      const n = cfg.n;
+      const { edges, turns } = computeGeometry(st);
+
+      const polyEl = document.getElementById(`${cfg.id}-poly`);
+      polyEl.setAttribute('points', st.verts.map(v => `${v.x.toFixed(1)},${v.y.toFixed(1)}`).join(' '));
+
+      const segSize = 1 / n;
+      const segIdx = Math.min(n - 1, Math.floor(st.cycleT / segSize));
+      const localU = Math.min(1, (st.cycleT - segIdx * segSize) / segSize);
+      const edgeFrac = 0.70;
+
+      const turnProgress = new Array(n).fill(0);
+      for (let k = 0; k < n; k++) {
+        if (st.cycleT >= 0.999) turnProgress[k] = 1;
+        else if (k < segIdx) turnProgress[k] = 1;
+        else if (k === segIdx && localU >= edgeFrac) {
+          turnProgress[k] = (localU - edgeFrac) / (1 - edgeFrac);
+        }
+      }
+
+      // Compute exact rounded integer exterior angles summing to 360°
+      const rawExts = turns.map(t => t.extDeg);
+      const roundedExts = rawExts.map(d => Math.round(d));
+      const diffSum = 360 - roundedExts.reduce((a, b) => a + b, 0);
+      let maxIdx = 0;
+      for (let k = 1; k < n; k++) if (rawExts[k] > rawExts[maxIdx]) maxIdx = k;
+      roundedExts[maxIdx] += diffSum;
+
+      let raysHTML = '';
+      let extHTML = '';
+      let intHTML = '';
+
+      const rayLen = n === 10 ? 38 : 54;
+      const arcR = n === 10 ? 20 : 28;
+      const lblOffset = n === 10 ? 15 : 18;
+      const fontSizeExt = n === 10 ? '11.2' : '13';
+
+      for (let k = 0; k < n; k++) {
+        const tInfo = turns[k];
+        const vx = tInfo.vertex.x;
+        const vy = tInfo.vertex.y;
+        const rx = vx + rayLen * Math.cos(tInfo.inAng);
+        const ry = vy + rayLen * Math.sin(tInfo.inAng);
+
+        if (st.showExt) {
+          raysHTML += `<line x1="${vx.toFixed(1)}" y1="${vy.toFixed(1)}" x2="${rx.toFixed(1)}" y2="${ry.toFixed(1)}" stroke="#e11d48" stroke-width="${n === 10 ? '2' : '2.5'}" stroke-dasharray="4 3"/>`;
+
+          const p1x = vx + arcR * Math.cos(tInfo.inAng);
+          const p1y = vy + arcR * Math.sin(tInfo.inAng);
+          const p2x = vx + arcR * Math.cos(tInfo.outAng);
+          const p2y = vy + arcR * Math.sin(tInfo.outAng);
+
+          const isLit = turnProgress[k] > 0.01;
+          const fillCol = isLit ? 'rgba(225, 29, 72, 0.28)' : 'rgba(225, 29, 72, 0.08)';
+          extHTML += `<path d="M ${vx.toFixed(1)},${vy.toFixed(1)} L ${p1x.toFixed(1)},${p1y.toFixed(1)} A ${arcR},${arcR} 0 0,1 ${p2x.toFixed(1)},${p2y.toFixed(1)} Z" fill="${fillCol}" stroke="#e11d48" stroke-width="${n === 10 ? '1.8' : '2.3'}"/>`;
+
+          const midAng = tInfo.inAng + tInfo.extRad / 2;
+          const lx = vx + (arcR + lblOffset) * Math.cos(midAng);
+          const ly = vy + (arcR + lblOffset) * Math.sin(midAng) + 4;
+          const labelTxt = n === 10 ? `${roundedExts[k]}°` : `e${SUBSCRIPTS[k]}=${roundedExts[k]}°`;
+          extHTML += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" font-weight="700" font-size="${fontSizeExt}" fill="#be123c">${labelTxt}</text>`;
+        }
+      }
+
+      if (st.showInt) {
+        const rIn = n === 10 ? 18 : 24;
+        const inLblOffset = n === 10 ? 14 : 18;
+        const fontSizeInt = n === 10 ? '10.8' : '12.5';
+
+        for (let i = 0; i < n; i++) {
+          const curr = st.verts[i];
+          const prev = st.verts[(i + n - 1) % n];
+          const next = st.verts[(i + 1) % n];
+          const a1 = Math.atan2(next.y - curr.y, next.x - curr.x);
+          const a2 = Math.atan2(prev.y - curr.y, prev.x - curr.x);
+
+          let sweep = a2 - a1;
+          while (sweep < 0) sweep += Math.PI * 2;
+          while (sweep >= Math.PI * 2) sweep -= Math.PI * 2;
+
+          const s1x = curr.x + rIn * Math.cos(a1);
+          const s1y = curr.y + rIn * Math.sin(a1);
+          const s2x = curr.x + rIn * Math.cos(a2);
+          const s2y = curr.y + rIn * Math.sin(a2);
+
+          intHTML += `<path d="M ${curr.x.toFixed(1)},${curr.y.toFixed(1)} L ${s1x.toFixed(1)},${s1y.toFixed(1)} A ${rIn},${rIn} 0 0,1 ${s2x.toFixed(1)},${s2y.toFixed(1)} Z" fill="rgba(14, 165, 233, 0.16)" stroke="#0284c7" stroke-width="${n === 10 ? '1.8' : '2.2'}"/>`;
+
+          const turnIdx = (i + n - 1) % n;
+          const inDeg = 180 - roundedExts[turnIdx];
+          const midIn = a1 + sweep / 2;
+          const lx = curr.x + (rIn + inLblOffset) * Math.cos(midIn);
+          const ly = curr.y + (rIn + inLblOffset) * Math.sin(midIn) + 4;
+          const inTxt = n === 10 ? `${inDeg}°` : `i${SUBSCRIPTS[turnIdx]}=${inDeg}°`;
+          intHTML += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" font-weight="700" font-size="${fontSizeInt}" fill="#0369a1">${inTxt}</text>`;
+        }
+      }
+
+      document.getElementById(`${cfg.id}-ext-rays`).innerHTML = raysHTML;
+      document.getElementById(`${cfg.id}-ext-angles`).innerHTML = extHTML;
+      document.getElementById(`${cfg.id}-int-angles`).innerHTML = intHTML;
+
+      // Render vertex handles & labels
+      const cx = st.verts.reduce((s, v) => s + v.x, 0) / n;
+      const cy = st.verts.reduce((s, v) => s + v.y, 0) / n;
+      let vHTML = '';
+      for (let i = 0; i < n; i++) {
+        const v = st.verts[i];
+        const outAng = Math.atan2(v.y - cy, v.x - cx);
+        const distOut = n === 10 ? 15 : 19;
+        const lx = v.x + distOut * Math.cos(outAng);
+        const ly = v.y + distOut * Math.sin(outAng) + 5;
+        vHTML += `<circle cx="${v.x.toFixed(1)}" cy="${v.y.toFixed(1)}" r="13" fill="rgba(15,23,42,0.05)" style="cursor:move;"/>`;
+        vHTML += `<circle cx="${v.x.toFixed(1)}" cy="${v.y.toFixed(1)}" r="${n === 10 ? '4.5' : '5.5'}" fill="#0f172a" stroke="#ffffff" stroke-width="1.8" style="cursor:move;"/>`;
+        vHTML += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="${n === 10 ? '15' : '18'}" fill="#0f172a">${v.name}</text>`;
+      }
+      document.getElementById(`${cfg.id}-vertices`).innerHTML = vHTML;
+
+      // Position Point P
+      const activeEdge = edges[segIdx];
+      const activeTurn = turns[segIdx];
+      let px, py, headingRad;
+
+      if (st.cycleT >= 0.999) {
+        px = st.verts[0].x;
+        py = st.verts[0].y;
+        headingRad = edges[0].ang;
+      } else if (localU < edgeFrac) {
+        const f = localU / edgeFrac;
+        px = activeEdge.from.x + (activeEdge.to.x - activeEdge.from.x) * f;
+        py = activeEdge.from.y + (activeEdge.to.y - activeEdge.from.y) * f;
+        headingRad = activeEdge.ang;
+      } else {
+        const f = (localU - edgeFrac) / (1 - edgeFrac);
+        px = activeTurn.vertex.x;
+        py = activeTurn.vertex.y;
+        headingRad = activeTurn.inAng + activeTurn.extRad * f;
+      }
+
+      const headingDeg = (headingRad * 180) / Math.PI;
+      document.getElementById(`${cfg.id}-point-P`).setAttribute('transform', `translate(${px.toFixed(1)}, ${py.toFixed(1)}) rotate(${headingDeg.toFixed(1)})`);
+
+      // Update live turn recorder
+      let totalCur = 0;
+      for (let k = 0; k < n; k++) {
+        const curVal = Math.round(roundedExts[k] * turnProgress[k]);
+        totalCur += curVal;
+        document.getElementById(`${cfg.id}-val-${k}`).textContent = `${curVal}°`;
+        document.getElementById(`${cfg.id}-eq-${k}`).textContent = `${curVal}°`;
+
+        const pill = document.getElementById(`${cfg.id}-pill-${k}`);
+        pill.classList.remove('active', 'done');
+        if (turnProgress[k] >= 0.99) pill.classList.add('done');
+        else if (turnProgress[k] > 0.01) pill.classList.add('active');
+      }
+
+      document.getElementById(`${cfg.id}-eq-sum`).textContent = `${totalCur}°`;
+      document.getElementById(`${cfg.id}-rec-total`).textContent = `Total Turn: ${totalCur}° / 360°`;
+
+      const pct = Math.round(st.cycleT * 100);
+      document.getElementById(`${cfg.id}-slider`).value = Math.round(st.cycleT * 1000);
+      document.getElementById(`${cfg.id}-pct`).textContent = `${pct}%`;
+
+      const statusEl = document.getElementById(`${cfg.id}-status`);
+      if (totalCur === 360) {
+        statusEl.textContent = `1 Complete Cycle: Sum of all ${n} exterior turns = 360°!`;
+      } else if (localU >= edgeFrac) {
+        statusEl.textContent = `Pivoting at Vertex ${activeTurn.vertex.name} through exterior angle e${SUBSCRIPTS[segIdx]}...`;
+      } else {
+        statusEl.textContent = `Moving straight along side ${activeEdge.from.name}${activeEdge.to.name} (0° turn)`;
+      }
+    }
+
+    // Controls per polygon slide
+    function toggleInterior(cfgIdx) {
+      const st = slideStates[cfgIdx];
+      st.showInt = !st.showInt;
+      const btn = document.getElementById(`${st.cfg.id}-btn-int`);
+      btn.innerHTML = st.showInt ? 'Hide Interior &angle;s (<em>i</em>)' : 'Show Interior &angle;s (<em>i</em>)';
+      btn.classList.toggle('active-blue', st.showInt);
+      renderSlide(cfgIdx);
+    }
+
+    function toggleExterior(cfgIdx) {
+      const st = slideStates[cfgIdx];
+      st.showExt = !st.showExt;
+      const btn = document.getElementById(`${st.cfg.id}-btn-ext`);
+      btn.innerHTML = st.showExt ? 'Hide Exterior &angle;s (<em>e</em>)' : 'Show Exterior &angle;s (<em>e</em>)';
+      btn.classList.toggle('active-red', st.showExt);
+      renderSlide(cfgIdx);
+    }
+
+    function toggleTurnRecorder(cfgIdx) {
+      const st = slideStates[cfgIdx];
+      st.showRecorder = !st.showRecorder;
+      const body = document.getElementById(`${st.cfg.id}-rec-body`);
+      const totalEl = document.getElementById(`${st.cfg.id}-rec-total`);
+      const headerEl = document.getElementById(`${st.cfg.id}-rec-header`);
+      const btn = document.getElementById(`${st.cfg.id}-btn-rec`);
+      body.style.display = st.showRecorder ? 'block' : 'none';
+      totalEl.style.display = st.showRecorder ? 'inline' : 'none';
+      headerEl.style.marginBottom = st.showRecorder ? '7px' : '0';
+      headerEl.style.paddingBottom = st.showRecorder ? '5px' : '0';
+      headerEl.style.borderBottom = st.showRecorder ? '1.5px solid #f1f5f9' : 'none';
+      btn.textContent = st.showRecorder ? 'Hide Record' : 'Show Record';
+      btn.classList.toggle('active-red', st.showRecorder);
+    }
+
+    function randomizePolygon(cfgIdx) {
+      const st = slideStates[cfgIdx];
+      st.presetIdx = (st.presetIdx + 1) % st.cfg.presets.length;
+      const base = st.cfg.presets[st.presetIdx];
+      const jitter = st.cfg.n === 10 ? 6 : 14;
+      const candidate = base.map(v => ({
+        x: v.x + (Math.random() * jitter * 2 - jitter),
+        y: v.y + (Math.random() * jitter * 2 - jitter),
+        name: v.name
+      }));
+      st.verts = isStrictlyConvex(candidate) ? candidate : base.map(v => ({ ...v }));
+      renderSlide(cfgIdx);
+    }
+
+    function onCycleSlider(cfgIdx, val) {
+      const st = slideStates[cfgIdx];
+      st.isPlaying = false;
+      document.getElementById(`${st.cfg.id}-btn-play`).textContent = 'Play';
+      st.cycleT = Number(val) / 1000;
+      renderSlide(cfgIdx);
+    }
+
+    function togglePlay(cfgIdx) {
+      const st = slideStates[cfgIdx];
+      st.isPlaying = !st.isPlaying;
+      if (st.isPlaying && st.cycleT >= 0.999) st.cycleT = 0;
+      document.getElementById(`${st.cfg.id}-btn-play`).textContent = st.isPlaying ? 'Pause' : 'Play';
+    }
+
+    function resetCycle(cfgIdx) {
+      const st = slideStates[cfgIdx];
+      st.isPlaying = false;
+      st.cycleT = 0;
+      st.pauseFrames = 0;
+      document.getElementById(`${st.cfg.id}-btn-play`).textContent = 'Play';
+      renderSlide(cfgIdx);
+    }
+
+    // Pointer interaction setup for each polygon slide's SVG
+    function getSvgCoords(svgEl, evt) {
+      const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+      const pt = svgEl.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const ctm = svgEl.getScreenCTM();
+      if (ctm) {
+        const res = pt.matrixTransform(ctm.inverse());
+        return { x: res.x, y: res.y };
+      }
+      const rect = svgEl.getBoundingClientRect();
+      return {
+        x: ((clientX - rect.left) / rect.width) * 460,
+        y: ((clientY - rect.top) / rect.height) * 365
+      };
+    }
+
+    function projectOntoPerimeter(st, pt) {
+      const n = st.cfg.n;
+      let bestDist = Infinity;
+      let bestT = 0;
+      const segSize = 1 / n;
+      const edgeFrac = 0.70;
+      for (let i = 0; i < n; i++) {
+        const a = st.verts[i];
+        const b = st.verts[(i + 1) % n];
+        const vx = b.x - a.x;
+        const vy = b.y - a.y;
+        const wx = pt.x - a.x;
+        const wy = pt.y - a.y;
+        const lenSq = vx * vx + vy * vy;
+        const u = Math.max(0, Math.min(1, (wx * vx + wy * vy) / lenSq));
+        const px = a.x + u * vx;
+        const py = a.y + u * vy;
+        const d = Math.hypot(pt.x - px, pt.y - py);
+        if (d < bestDist) {
+          bestDist = d;
+          if (u > 0.94) {
+            bestT = i * segSize + 0.85 * segSize;
+          } else {
+            bestT = i * segSize + u * edgeFrac * segSize;
+          }
+        }
+      }
+      return bestT;
+    }
+
+    SLIDE_CONFIGS.forEach((cfg, cfgIdx) => {
+      const svgEl = document.getElementById(`${cfg.id}-svg`);
+      svgEl.addEventListener('pointerdown', (e) => {
+        const st = slideStates[cfgIdx];
+        const pt = getSvgCoords(svgEl, e);
+        for (let i = 0; i < cfg.n; i++) {
+          if (Math.hypot(pt.x - st.verts[i].x, pt.y - st.verts[i].y) < 16) {
+            st.dragMode = i;
+            return;
+          }
+        }
+        st.isPlaying = false;
+        document.getElementById(`${cfg.id}-btn-play`).textContent = 'Play';
+        st.dragMode = 'P';
+        const rawT = projectOntoPerimeter(st, pt);
+        if (st.cycleT > 0.88 && rawT < 0.10) st.cycleT = 1;
+        else if (st.cycleT < 0.10 && rawT > 0.88) st.cycleT = 0;
+        else st.cycleT = rawT;
+        renderSlide(cfgIdx);
+      });
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      const cfgIdx = currentSlide - 1;
+      if (cfgIdx < 0 || cfgIdx >= slideStates.length) return;
+      const st = slideStates[cfgIdx];
+      if (!st || st.dragMode === null) return;
+      const svgEl = document.getElementById(`${st.cfg.id}-svg`);
+      const pt = getSvgCoords(svgEl, e);
+      if (typeof st.dragMode === 'number') {
+        const idx = st.dragMode;
+        const testVerts = st.verts.map((v, i) =>
+          i === idx
+            ? { ...v, x: Math.max(55, Math.min(405, pt.x)), y: Math.max(45, Math.min(285, pt.y)) }
+            : v
+        );
+        if (isStrictlyConvex(testVerts)) {
+          st.verts = testVerts;
+          renderSlide(cfgIdx);
+        }
+      } else if (st.dragMode === 'P') {
+        const rawT = projectOntoPerimeter(st, pt);
+        if (st.cycleT > 0.88 && rawT < 0.10) st.cycleT = 1;
+        else if (st.cycleT < 0.10 && rawT > 0.88) st.cycleT = 0;
+        else st.cycleT = rawT;
+        renderSlide(cfgIdx);
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      slideStates.forEach(st => { st.dragMode = null; });
+    });
+
+    const TOTAL_SLIDES = 9;
+    const EXTRA_SLIDE_LABELS = [
+      'Circle vs. Pentagon Turn',
+      'Visual Proof: Shrinking to a Point',
+      'Sum of Exterior Angles = 360°',
+      'Exterior Angles Checkpoint Quiz'
+    ];
+
+    // Slide Navigation
+    function updateNavUI() {
+      document.querySelectorAll('.slide').forEach((el, idx) => {
+        el.classList.toggle('active', idx === currentSlide);
+      });
+      document.querySelectorAll('.tab-pill').forEach((el, idx) => {
+        el.classList.toggle('active', idx === currentSlide);
+      });
+      document.getElementById('btn-prev').disabled = currentSlide === 0;
+      document.getElementById('btn-next').disabled = currentSlide === TOTAL_SLIDES - 1;
+      if (currentSlide === 0) {
+        document.getElementById('slide-tracker').textContent = `Slide 1 of ${TOTAL_SLIDES} • Anatomy of a Convex Polygon`;
+      } else if (currentSlide >= 1 && currentSlide <= SLIDE_CONFIGS.length) {
+        const cfg = SLIDE_CONFIGS[currentSlide - 1];
+        document.getElementById('slide-tracker').textContent = `Slide ${currentSlide + 1} of ${TOTAL_SLIDES} • ${cfg.shortName} (n = ${cfg.n})`;
+      } else {
+        const label = EXTRA_SLIDE_LABELS[currentSlide - 1 - SLIDE_CONFIGS.length];
+        document.getElementById('slide-tracker').textContent = `Slide ${currentSlide + 1} of ${TOTAL_SLIDES} • ${label}`;
+      }
+
+      if (typeof startTurnLoop === 'function') {
+        if (currentSlide === 5) startTurnLoop();
+        else stopTurnLoop();
+      }
+      if (typeof startShrinkLoop === 'function') {
+        if (currentSlide === 6) startShrinkLoop();
+        else stopShrinkLoop();
+      }
+    }
+
+    function navigate(dir) {
+      goToSlide(currentSlide + dir);
+    }
+
+    function goToSlide(idx) {
+      currentSlide = Math.max(0, Math.min(TOTAL_SLIDES - 1, idx));
+      updateNavUI();
+      if (currentSlide >= 1 && currentSlide <= SLIDE_CONFIGS.length) {
+        renderSlide(currentSlide - 1);
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'ArrowLeft') navigate(-1);
+    });
+
+    // Master animation loop (only animates active polygon slide when on slides 1..4)
+    function animate() {
+      const cfgIdx = currentSlide - 1;
+      if (cfgIdx >= 0 && cfgIdx < slideStates.length) {
+        const st = slideStates[cfgIdx];
+        if (st && st.isPlaying && st.dragMode === null) {
+          if (st.pauseFrames > 0) {
+            st.pauseFrames--;
+            if (st.pauseFrames === 0) st.cycleT = 0;
+          } else {
+            const speed = st.cfg.n === 10 ? 0.0018 : 0.0024;
+            st.cycleT += speed;
+            if (st.cycleT >= 1) {
+              st.cycleT = 1;
+              st.pauseFrames = 110;
+            }
+            renderSlide(cfgIdx);
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    function fitToViewport() {
+      const app = document.getElementById('app-container');
+      const scaleX = (window.innerWidth - 24) / 1280;
+      const scaleY = (window.innerHeight - 24) / 720;
+      const scale = Math.min(1, scaleX, scaleY);
+      app.style.transform = `scale(${scale})`;
+      app.style.transformOrigin = 'center center';
+    }
+
+
+    /* =====================================================================
+       SLIDE 6 (index 5) INTERACTIVE ENGINE: Moving Point A on Circle vs Pentagon
+       ===================================================================== */
+    const turnCircleArc = document.getElementById('turn-circle-arc');
+    const turnCircleA = document.getElementById('turn-circle-a');
+    const turnCircleReadout = document.getElementById('turn-circle-readout');
+    const turnPentPoly = document.getElementById('turn-pent-poly');
+    const turnPentWedges = document.getElementById('turn-pent-wedges');
+    const turnPentRays = document.getElementById('turn-pent-rays');
+    const turnPentA = document.getElementById('turn-pent-a');
+    const turnPentReadout = document.getElementById('turn-pent-readout');
+    const turnSlider = document.getElementById('turn-slider');
+    const turnPct = document.getElementById('turn-pct');
+
+    const tcCx = 112, tcCy = 148, tcR = 68;
+    const tpVerts = [
+      { x: 342, y: 74 },
+      { x: 416, y: 128 },
+      { x: 388, y: 216 },
+      { x: 296, y: 216 },
+      { x: 268, y: 128 }
+    ];
+    turnPentPoly.setAttribute('points', tpVerts.map(v => `${v.x},${v.y}`).join(' '));
+
+    const tpEdges = [];
+    let tpTotalLen = 0;
+    for (let i = 0; i < 5; i++) {
+      const a = tpVerts[i];
+      const b = tpVerts[(i + 1) % 5];
+      const len = Math.hypot(b.x - a.x, b.y - a.y);
+      const ang = Math.atan2(b.y - a.y, b.x - a.x);
+      tpEdges.push({ a, b, len, ang, startDist: tpTotalLen });
+      tpTotalLen += len;
+    }
+
+    let raysHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const prevEdge = tpEdges[(i + 4) % 5];
+      const v = tpVerts[i];
+      const rx = v.x + 34 * Math.cos(prevEdge.ang);
+      const ry = v.y + 34 * Math.sin(prevEdge.ang);
+      raysHTML += `<line x1="${v.x}" y1="${v.y}" x2="${rx.toFixed(1)}" y2="${ry.toFixed(1)}" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>`;
+    }
+    turnPentRays.innerHTML = raysHTML;
+
+    const turnSvg = document.getElementById('svg-turn');
+    const turnStatus = document.getElementById('turn-status');
+    let turnT = 0;
+    let turnPlaying = true;
+    let turnPause = 0;
+    let turnRaf = null;
+    let turnMode = 'auto';
+    let turnDragTarget = null;
+
+    function setTurnMode(mode) {
+      turnMode = mode;
+      document.getElementById('turn-mode-auto').classList.toggle('active', mode === 'auto');
+      document.getElementById('turn-mode-hand').classList.toggle('active', mode === 'hand');
+      if (mode === 'hand') {
+        turnPlaying = false;
+        document.getElementById('turn-play-btn').textContent = 'Play';
+        turnStatus.textContent = 'Hand-Draft Mode: Drag Point A directly around the circle or pentagon';
+      } else {
+        turnPlaying = true;
+        document.getElementById('turn-play-btn').textContent = 'Pause';
+        turnStatus.textContent = '1 complete loop = 360° total change in direction';
+      }
+    }
+
+    function getTurnSvgCoords(evt) {
+      const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+      const pt = turnSvg.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const ctm = turnSvg.getScreenCTM();
+      if (ctm) {
+        const svgPt = pt.matrixTransform(ctm.inverse());
+        return { x: svgPt.x, y: svgPt.y };
+      }
+      const rect = turnSvg.getBoundingClientRect();
+      return {
+        x: ((clientX - rect.left) / rect.width) * 460,
+        y: ((clientY - rect.top) / rect.height) * 340
+      };
+    }
+
+    function projectOntoPentagonT(pt) {
+      let bestDist = Infinity;
+      let bestT = 0;
+      const segTotal = 0.2;
+      for (let i = 0; i < 5; i++) {
+        const edge = tpEdges[i];
+        const vx = edge.b.x - edge.a.x;
+        const vy = edge.b.y - edge.a.y;
+        const wx = pt.x - edge.a.x;
+        const wy = pt.y - edge.a.y;
+        const lenSq = vx * vx + vy * vy;
+        let u = Math.max(0, Math.min(1, (wx * vx + wy * vy) / lenSq));
+        const projX = edge.a.x + u * vx;
+        const projY = edge.a.y + u * vy;
+        const dist = Math.hypot(pt.x - projX, pt.y - projY);
+        if (dist < bestDist) {
+          bestDist = dist;
+          if (u > 0.96) {
+            bestT = i * segTotal + 0.18;
+          } else {
+            bestT = i * segTotal + u * 0.144;
+          }
+        }
+      }
+      return bestT;
+    }
+
+    turnSvg.addEventListener('pointerdown', (e) => {
+      const pt = getTurnSvgCoords(e);
+      const distCircle = Math.abs(Math.hypot(pt.x - tcCx, pt.y - tcCy) - tcR);
+      if (pt.x < 225 && distCircle < 34) {
+        setTurnMode('hand');
+        turnDragTarget = 'circle';
+        updateTurnFromDrag(pt);
+      } else if (pt.x >= 225) {
+        setTurnMode('hand');
+        turnDragTarget = 'pentagon';
+        updateTurnFromDrag(pt);
+      }
+    });
+
+    function updateTurnFromDrag(pt) {
+      if (turnDragTarget === 'circle') {
+        let ang = Math.atan2(pt.y - tcCy, pt.x - tcCx) + Math.PI / 2;
+        if (ang < 0) ang += Math.PI * 2;
+        const rawT = ang / (Math.PI * 2);
+        if (turnT > 0.85 && rawT < 0.15) turnT = 1;
+        else if (turnT < 0.15 && rawT > 0.85) turnT = 0;
+        else turnT = rawT;
+        renderTurn(turnT);
+      } else if (turnDragTarget === 'pentagon') {
+        const rawT = projectOntoPentagonT(pt);
+        if (turnT > 0.85 && rawT < 0.12) turnT = 1;
+        else if (turnT < 0.12 && rawT > 0.85) turnT = 0;
+        else turnT = rawT;
+        renderTurn(turnT);
+      }
+    }
+
+    window.addEventListener('pointermove', (e) => {
+      if (!turnDragTarget) return;
+      updateTurnFromDrag(getTurnSvgCoords(e));
+    });
+
+    window.addEventListener('pointerup', () => {
+      turnDragTarget = null;
+    });
+
+    function renderTurn(t) {
+      const theta = t * Math.PI * 2;
+      const posAng = -Math.PI / 2 + theta;
+      const ax = tcCx + tcR * Math.cos(posAng);
+      const ay = tcCy + tcR * Math.sin(posAng);
+      const tanDeg = (theta * 180) / Math.PI;
+      turnCircleA.setAttribute('transform', `translate(${ax.toFixed(1)}, ${ay.toFixed(1)}) rotate(${tanDeg.toFixed(1)})`);
+
+      if (t <= 0.002) {
+        turnCircleArc.setAttribute('d', '');
+      } else if (t >= 0.998) {
+        turnCircleArc.setAttribute('d', `M ${tcCx},${tcCy - tcR} A ${tcR},${tcR} 0 1,1 ${tcCx - 0.1},${tcCy - tcR} L ${tcCx},${tcCy} Z`);
+      } else {
+        const largeArc = theta > Math.PI ? 1 : 0;
+        turnCircleArc.setAttribute('d', `M ${tcCx},${tcCy} L ${tcCx},${tcCy - tcR} A ${tcR},${tcR} 0 ${largeArc},1 ${ax.toFixed(1)},${ay.toFixed(1)} Z`);
+      }
+      const cDeg = Math.round(t * 360);
+      turnCircleReadout.textContent = `Turned: ${cDeg}° / 360°`;
+
+      const segTotal = 0.2;
+      const segIdx = Math.min(4, Math.floor(t / segTotal));
+      const localU = Math.min(1, (t - segIdx * segTotal) / segTotal);
+
+      const edge = tpEdges[segIdx];
+      const nextEdge = tpEdges[(segIdx + 1) % 5];
+
+      let h1 = edge.ang;
+      let h2 = nextEdge.ang;
+      let diff = h2 - h1;
+      while (diff <= 0) diff += Math.PI * 2;
+      while (diff > Math.PI * 2) diff -= Math.PI * 2;
+
+      let px, py, headRad, completedTurns;
+      if (localU < 0.72) {
+        const f = localU / 0.72;
+        px = edge.a.x + (edge.b.x - edge.a.x) * f;
+        py = edge.a.y + (edge.b.y - edge.a.y) * f;
+        headRad = h1;
+        completedTurns = segIdx * 72;
+      } else {
+        const f = (localU - 0.72) / 0.28;
+        px = edge.b.x;
+        py = edge.b.y;
+        headRad = h1 + diff * f;
+        completedTurns = segIdx * 72 + Math.round(f * 72);
+      }
+
+      if (t >= 0.998) {
+        px = tpVerts[0].x;
+        py = tpVerts[0].y;
+        headRad = tpEdges[0].ang;
+        completedTurns = 360;
+      }
+
+      const headDeg = (headRad * 180) / Math.PI;
+      turnPentA.setAttribute('transform', `translate(${px.toFixed(1)}, ${py.toFixed(1)}) rotate(${headDeg.toFixed(1)})`);
+
+      let wedgesHTML = '';
+      const numLit = t >= 0.998 ? 5 : segIdx + (localU >= 0.72 ? 1 : 0);
+      for (let k = 0; k < numLit; k++) {
+        const cornerIdx = (k + 1) % 5;
+        const v = tpVerts[cornerIdx];
+        const aIn = tpEdges[k].ang;
+        const aOut = tpEdges[cornerIdx].ang;
+        const rW = 24;
+        const p1x = v.x + rW * Math.cos(aIn);
+        const p1y = v.y + rW * Math.sin(aIn);
+        const p2x = v.x + rW * Math.cos(aOut);
+        const p2y = v.y + rW * Math.sin(aOut);
+        wedgesHTML += `<path d="M ${v.x},${v.y} L ${p1x.toFixed(1)},${p1y.toFixed(1)} A ${rW},${rW} 0 0,1 ${p2x.toFixed(1)},${p2y.toFixed(1)} Z" fill="rgba(2,132,199,0.28)" stroke="#0284c7" stroke-width="2"/>`;
+      }
+      turnPentWedges.innerHTML = wedgesHTML;
+      turnPentReadout.textContent = `Exterior Turn: ${completedTurns}° / 360°`;
+
+      const pct = Math.round(t * 100);
+      turnSlider.value = pct;
+      turnPct.textContent = `${pct}%`;
+    }
+
+    function onTurnSlider(val) {
+      turnPlaying = false;
+      document.getElementById('turn-play-btn').textContent = 'Play';
+      turnT = Number(val) / 100;
+      renderTurn(turnT);
+    }
+
+    function toggleTurnAnim() {
+      turnPlaying = !turnPlaying;
+      if (turnPlaying) {
+        turnMode = 'auto';
+        document.getElementById('turn-mode-auto').classList.add('active');
+        document.getElementById('turn-mode-hand').classList.remove('active');
+        turnStatus.textContent = '1 complete loop = 360° total change in direction';
+      }
+      document.getElementById('turn-play-btn').textContent = turnPlaying ? 'Pause' : 'Play';
+    }
+
+    function resetTurnAnim() {
+      turnPlaying = false;
+      turnT = 0;
+      turnPause = 0;
+      document.getElementById('turn-play-btn').textContent = 'Play';
+      renderTurn(0);
+    }
+
+    function startTurnLoop() {
+      if (turnRaf) return;
+      function step() {
+        if (turnPlaying) {
+          if (turnPause > 0) {
+            turnPause--;
+          } else {
+            turnT += 0.0032;
+            if (turnT >= 1) {
+              turnT = 1;
+              renderTurn(1);
+              turnPause = 100;
+            } else {
+              renderTurn(turnT);
+            }
+          }
+          if (turnT >= 1 && turnPause === 0) {
+            turnT = 0;
+          }
+        }
+        turnRaf = requestAnimationFrame(step);
+      }
+      turnRaf = requestAnimationFrame(step);
+    }
+
+    function stopTurnLoop() {
+      if (turnRaf) {
+        cancelAnimationFrame(turnRaf);
+        turnRaf = null;
+      }
+    }
+
+    renderTurn(0);
+
+    
+    /* =====================================================================
+       SLIDE 7 (index 6) INTERACTIVE ENGINE: Shrinking Polygon to a Point (Ext = 360)
+       ===================================================================== */
+    const shrinkWedges = document.getElementById('shrink-wedges');
+    const shrinkRays = document.getElementById('shrink-rays');
+    const shrinkPoly = document.getElementById('shrink-poly');
+    const shrinkStatus = document.getElementById('shrink-status');
+    const shrinkSlider = document.getElementById('shrink-slider');
+    const shrinkPct = document.getElementById('shrink-pct');
+
+    const shrinkCenter = { x: 210, y: 170 };
+    const basePentagon = [
+      { x: 210, y: 58 },
+      { x: 324, y: 136 },
+      { x: 282, y: 266 },
+      { x: 138, y: 266 },
+      { x: 96, y: 136 }
+    ];
+    const wedgeColors = [
+      'rgba(225, 29, 72, 0.28)',
+      'rgba(14, 165, 233, 0.28)',
+      'rgba(217, 119, 6, 0.28)',
+      'rgba(16, 185, 129, 0.28)',
+      'rgba(139, 92, 246, 0.28)'
+    ];
+    const wedgeStrokes = ['#e11d48', '#0284c7', '#d97706', '#059669', '#7c3aed'];
+
+    let shrinkFactor = 0;
+    let shrinkPlaying = true;
+    let shrinkDir = 1;
+    let shrinkPauseFrames = 0;
+    let shrinkRaf = null;
+
+    function renderShrink(t) {
+      const scale = 1 - t;
+      const verts = basePentagon.map(v => ({
+        x: shrinkCenter.x + (v.x - shrinkCenter.x) * scale,
+        y: shrinkCenter.y + (v.y - shrinkCenter.y) * scale
+      }));
+
+      shrinkPoly.setAttribute('points', verts.map(v => `${v.x.toFixed(1)},${v.y.toFixed(1)}`).join(' '));
+      shrinkPoly.style.opacity = t > 0.98 ? '0' : '1';
+
+      let wedgeHTML = '';
+      let rayHTML = '';
+      const wedgeR = 46 + t * 24;
+
+      for (let i = 0; i < 5; i++) {
+        const prev = basePentagon[(i + 4) % 5];
+        const curr = basePentagon[i];
+        const next = basePentagon[(i + 1) % 5];
+
+        const dirExt = Math.atan2(curr.y - prev.y, curr.x - prev.x);
+        const dirOut = Math.atan2(next.y - curr.y, next.x - curr.x);
+
+        const vx = verts[i].x;
+        const vy = verts[i].y;
+
+        const p1x = vx + wedgeR * Math.cos(dirExt);
+        const p1y = vy + wedgeR * Math.sin(dirExt);
+        const p2x = vx + wedgeR * Math.cos(dirOut);
+        const p2y = vy + wedgeR * Math.sin(dirOut);
+
+        wedgeHTML += `<path d="M ${vx.toFixed(1)},${vy.toFixed(1)} L ${p1x.toFixed(1)},${p1y.toFixed(1)} A ${wedgeR},${wedgeR} 0 0,1 ${p2x.toFixed(1)},${p2y.toFixed(1)} Z" fill="${wedgeColors[i]}" stroke="${wedgeStrokes[i]}" stroke-width="2.5"/>`;
+
+        const rayLen = wedgeR + 18;
+        const rx = vx + rayLen * Math.cos(dirExt);
+        const ry = vy + rayLen * Math.sin(dirExt);
+        rayHTML += `<line x1="${vx.toFixed(1)}" y1="${vy.toFixed(1)}" x2="${rx.toFixed(1)}" y2="${ry.toFixed(1)}" stroke="${wedgeStrokes[i]}" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+
+        let diff = dirOut - dirExt;
+        if (diff < 0) diff += Math.PI * 2;
+        const midAng = dirExt + diff / 2;
+        const lr = wedgeR * 0.64;
+        const lx = vx + lr * Math.cos(midAng);
+        const ly = vy + lr * Math.sin(midAng) + 5;
+        wedgeHTML += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" font-weight="700" font-size="14" fill="#0f172a">e${i + 1}</text>`;
+      }
+
+      shrinkWedges.innerHTML = wedgeHTML;
+      shrinkRays.innerHTML = rayHTML;
+
+      const pct = Math.round(t * 100);
+      shrinkSlider.value = pct;
+      shrinkPct.textContent = `${pct}%`;
+
+      if (pct >= 98) {
+        shrinkStatus.textContent = `Contraction: 100% — e₁ + e₂ + e₃ + e₄ + e₅ = 360° around P!`;
+      } else {
+        shrinkStatus.textContent = `Contraction: ${pct}% — Parallel sides preserve exterior angles`;
+      }
+    }
+
+    function onShrinkSlider(val) {
+      shrinkPlaying = false;
+      document.getElementById('shrink-play-btn').textContent = 'Play';
+      shrinkFactor = Number(val) / 100;
+      renderShrink(shrinkFactor);
+    }
+
+    function toggleShrinkAnim() {
+      shrinkPlaying = !shrinkPlaying;
+      document.getElementById('shrink-play-btn').textContent = shrinkPlaying ? 'Pause' : 'Play';
+    }
+
+    function resetShrinkAnim() {
+      shrinkPlaying = false;
+      shrinkFactor = 0;
+      shrinkDir = 1;
+      shrinkPauseFrames = 0;
+      document.getElementById('shrink-play-btn').textContent = 'Play';
+      renderShrink(0);
+    }
+
+    function startShrinkLoop() {
+      if (shrinkRaf) return;
+      function step() {
+        if (shrinkPlaying) {
+          if (shrinkPauseFrames > 0) {
+            shrinkPauseFrames--;
+          } else {
+            shrinkFactor += 0.008 * shrinkDir;
+            if (shrinkFactor >= 1) {
+              shrinkFactor = 1;
+              shrinkDir = -1;
+              shrinkPauseFrames = 90;
+            } else if (shrinkFactor <= 0) {
+              shrinkFactor = 0;
+              shrinkDir = 1;
+              shrinkPauseFrames = 45;
+            }
+            renderShrink(shrinkFactor);
+          }
+        }
+        shrinkRaf = requestAnimationFrame(step);
+      }
+      shrinkRaf = requestAnimationFrame(step);
+    }
+
+    function stopShrinkLoop() {
+      if (shrinkRaf) {
+        cancelAnimationFrame(shrinkRaf);
+        shrinkRaf = null;
+      }
+    }
+
+    renderShrink(0);
+
+
+    /* =====================================================================
+       CHECKPOINT QUIZ ENGINE (Rotates 4 similar questions on Restart)
+       ===================================================================== */
+    const miniQuizSets = {
+      extq: [
+        {
+            level: "Step 1: Core Concept",
+            diffClass: "q-pill-diff-easy",
+            topic: "AfL • Sum of Exterior Angles (e)",
+            prompt: "1. A convex heptagon has <strong>7 sides</strong> (<em>n</em> = 7). What is the sum of its 7 exterior angles (<em>e</em><sub>1</sub> + <em>e</em><sub>2</sub> + &hellip; + <em>e</em><sub>7</sub>)?",
+            options: ["360°", "180°", "540°", "900°"],
+            correct: 0,
+            explanation: "For <strong>any</strong> convex polygon, one full turn around the perimeter gives <em>e</em><sub>1</sub> + <em>e</em><sub>2</sub> + &hellip; + <em>e<sub>n</sub></em> = <strong>360&deg;</strong>, regardless of the number of sides <em>n</em>.",
+            svg: `<polygon points="180,52 252,78 278,148 242,212 166,225 104,180 110,98" fill="rgba(225,29,72,0.07)" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/>
+                  <line x1="180" y1="52" x2="232" y2="24" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <line x1="252" y1="78" x2="296" y2="102" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <line x1="278" y1="148" x2="293" y2="202" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <line x1="242" y1="212" x2="205" y2="252" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <line x1="166" y1="225" x2="112" y2="234" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <line x1="104" y1="180" x2="66" y2="142" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <line x1="110" y1="98" x2="105" y2="48" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <text x="190" y="142" text-anchor="middle" font-weight="700" font-size="16" fill="#0f172a">Convex 7-gon (n = 7)</text>
+                  <text x="180" y="284" text-anchor="middle" font-weight="700" font-size="15.5" fill="#e11d48">e&#8321; + e&#8322; + &hellip; + e&#8327; = ?</text>`
+          },
+        {
+            level: "Step 2: i and e Pair",
+            diffClass: "q-pill-diff-med",
+            topic: "AfL • Linear Pair (i + e = 180°)",
+            prompt: "2. At one vertex of a convex polygon, the interior angle is <strong><em>i</em> = 115&deg;</strong>. What is its adjacent exterior angle <strong><em>e</em></strong>?",
+            options: ["55°", "75°", "65°", "245°"],
+            correct: 2,
+            explanation: "An interior angle <em>i</em> and its adjacent exterior angle <em>e</em> form a straight line: <em>i</em> + <em>e</em> = 180&deg;. So <em>e</em> = 180&deg; &minus; 115&deg; = <strong>65&deg;</strong>.",
+            svg: `<polygon points="150,70 250,115 215,215 105,215 85,120" fill="rgba(14,165,233,0.06)" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/>
+                  <line x1="215" y1="215" x2="310" y2="215" stroke="#e11d48" stroke-width="3" stroke-dasharray="5 3"/>
+                  <path d="M 227,181 A 36,36 0 0,0 179,215" fill="none" stroke="#0284c7" stroke-width="3.2"/>
+                  <text x="168" y="182" text-anchor="middle" font-size="14" font-weight="700" fill="#0284c7">i = 115&deg;</text>
+                  <path d="M 251,215 A 36,36 0 0,0 227,181" fill="none" stroke="#e11d48" stroke-width="3.2"/>
+                  <text x="275" y="192" text-anchor="middle" font-size="14.5" font-weight="700" fill="#e11d48">e = ?</text>
+                  <text x="180" y="278" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">Straight Line: i + e = 180&deg;</text>`
+          },
+        {
+            level: "Step 3: Missing Angle e",
+            diffClass: "q-pill-diff-hard",
+            topic: "AfL • Finding an Unknown Exterior Angle",
+            prompt: "3. Three exterior angles of a convex quadrilateral are <strong>80&deg;, 95&deg;, and 105&deg;</strong>. Find the fourth exterior angle <strong><em>e</em></strong>.",
+            options: ["70°", "90°", "100°", "80°"],
+            correct: 3,
+            explanation: "The 4 exterior angles sum to 360&deg;: 80&deg; + 95&deg; + 105&deg; + <em>e</em> = 360&deg; &rArr; 280&deg; + <em>e</em> = 360&deg; &rArr; <em>e</em> = <strong>80&deg;</strong>.",
+            svg: `<polygon points="118,82 238,82 252,195 104,195" fill="rgba(255,255,255,0.92)" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/>
+                  <line x1="118" y1="82" x2="112" y2="34" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3"/>
+                  <path d="M 115,58 A 24,24 0 0,1 142,82" fill="none" stroke="#e11d48" stroke-width="2.4"/>
+                  <text x="154" y="60" font-size="13.5" font-weight="700" fill="#e11d48">80&deg;</text>
+                  <line x1="238" y1="82" x2="290" y2="82" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3"/>
+                  <path d="M 262,82 A 24,24 0 0,1 241,106" fill="none" stroke="#e11d48" stroke-width="2.4"/>
+                  <text x="276" y="112" font-size="13.5" font-weight="700" fill="#e11d48">95&deg;</text>
+                  <line x1="252" y1="195" x2="258" y2="245" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3"/>
+                  <path d="M 255,219 A 24,24 0 0,1 228,195" fill="none" stroke="#e11d48" stroke-width="2.4"/>
+                  <text x="218" y="236" font-size="13.5" font-weight="700" fill="#e11d48">105&deg;</text>
+                  <line x1="104" y1="195" x2="54" y2="195" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3"/>
+                  <path d="M 80,195 A 24,24 0 0,1 107,171" fill="none" stroke="#e11d48" stroke-width="2.4"/>
+                  <text x="64" y="168" font-size="14.5" font-weight="700" fill="#0284c7">e = ?</text>
+                  <text x="180" y="284" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">Sum of Exterior &angle;s = 360&deg;</text>`
+          },
+        {
+            level: "Step 3: Missing Angle e",
+            diffClass: "q-pill-diff-hard",
+            topic: "AfL • Finding an Unknown Exterior Angle",
+            prompt: "3. Four exterior angles of a convex pentagon are <strong>60&deg;, 70&deg;, 75&deg;, and 85&deg;</strong>. Find the fifth exterior angle <strong><em>e</em></strong>.",
+            options: ["70°", "60°", "80°", "90°"],
+            correct: 0,
+            explanation: "Sum of the 5 exterior angles = 360&deg;. Known sum = 60&deg; + 70&deg; + 75&deg; + 85&deg; = 290&deg;. So <em>e</em> = 360&deg; &minus; 290&deg; = <strong>70&deg;</strong>.",
+            svg: `<polygon points="180,62 256,118 226,208 134,208 104,118" fill="rgba(255,255,255,0.92)" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/>
+                  <line x1="180" y1="62" x2="225" y2="30" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <text x="234" y="58" font-size="13.5" font-weight="700" fill="#e11d48">60&deg;</text>
+                  <line x1="256" y1="118" x2="296" y2="155" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <text x="285" y="130" font-size="13.5" font-weight="700" fill="#e11d48">70&deg;</text>
+                  <line x1="226" y1="208" x2="195" y2="250" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <text x="232" y="238" font-size="13.5" font-weight="700" fill="#e11d48">75&deg;</text>
+                  <line x1="134" y1="208" x2="82" y2="208" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <text x="86" y="230" font-size="13.5" font-weight="700" fill="#e11d48">85&deg;</text>
+                  <line x1="104" y1="118" x2="84" y2="68" stroke="#e11d48" stroke-width="2.4" stroke-dasharray="4 3"/>
+                  <text x="64" y="108" font-size="14.5" font-weight="700" fill="#0284c7">e = ?</text>
+                  <text x="180" y="284" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">Sum of Exterior &angle;s = 360&deg;</text>`
+          },
+        {
+            level: "Step 3: Missing Angle e",
+            diffClass: "q-pill-diff-hard",
+            topic: "AfL • Finding an Unknown Exterior Angle",
+            prompt: "3. Two exterior angles of a triangle are <strong>110&deg; and 130&deg;</strong>. Find the third exterior angle <strong><em>e</em></strong>.",
+            options: ["100°", "110°", "120°", "140°"],
+            correct: 2,
+            explanation: "The 3 exterior angles of a triangle sum to 360&deg;: 110&deg; + 130&deg; + <em>e</em> = 360&deg; &rArr; 240&deg; + <em>e</em> = 360&deg; &rArr; <em>e</em> = <strong>120&deg;</strong>.",
+            svg: `<polygon points="180,75 262,195 98,195" fill="rgba(255,255,255,0.92)" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/>
+                  <line x1="180" y1="75" x2="212" y2="28" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3"/>
+                  <text x="228" y="64" font-size="13.5" font-weight="700" fill="#e11d48">110&deg;</text>
+                  <line x1="262" y1="195" x2="294" y2="242" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3"/>
+                  <text x="242" y="238" font-size="13.5" font-weight="700" fill="#e11d48">130&deg;</text>
+                  <line x1="98" y1="195" x2="42" y2="195" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3"/>
+                  <text x="64" y="172" font-size="14.5" font-weight="700" fill="#0284c7">e = ?</text>
+                  <text x="180" y="284" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">Sum of Exterior &angle;s = 360&deg;</text>`
+          },
+        {
+            level: "Step 4: Regular Polygon",
+            diffClass: "q-pill-diff-expert",
+            topic: "AfL • Regular Convex Pentagon",
+            prompt: "4. A <strong>regular</strong> convex pentagon has <strong>5 equal sides</strong>. Find each exterior angle <strong><em>e</em></strong> and each interior angle <strong><em>i</em></strong>.",
+            options: ["e = 60°, i = 120°", "e = 108°, i = 72°", "e = 90°, i = 90°", "e = 72°, i = 108°"],
+            correct: 3,
+            explanation: "For 5 equal exterior angles, <em>e</em> = 360&deg; &divide; 5 = <strong>72&deg;</strong>. Then each interior angle is <em>i</em> = 180&deg; &minus; 72&deg; = <strong>108&deg;</strong>.",
+            svg: `<polygon points="180,62 252,114 224,198 136,198 108,114" fill="rgba(14,165,233,0.07)" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/>
+                  <line x1="224" y1="198" x2="292" y2="198" stroke="#e11d48" stroke-width="2.6" stroke-dasharray="4 3"/>
+                  <path d="M 254,198 A 30,30 0 0,0 233,170" fill="none" stroke="#e11d48" stroke-width="2.8"/>
+                  <path d="M 233,170 A 30,30 0 0,0 194,198" fill="none" stroke="#0284c7" stroke-width="2.8"/>
+                  <text x="276" y="176" font-size="14" font-weight="700" fill="#e11d48">e = ?</text>
+                  <text x="196" y="174" text-anchor="middle" font-size="14" font-weight="700" fill="#0284c7">i = ?</text>
+                  <text x="180" y="132" text-anchor="middle" font-size="13.5" font-weight="700" fill="#334155">Regular 5-gon</text>
+                  <text x="180" y="268" text-anchor="middle" font-size="14.5" font-weight="700" fill="#0f172a">5 equal e &rArr; 5e = 360&deg;</text>`
+          }
+      ]
+    };
+
+    function getActiveMiniQuestions(prefix) {
+      const raw = miniQuizSets[prefix];
+      return Array.isArray(raw[0]) ? raw.flat() : raw;
+    }
+
+    const miniQuizBank = {
+      extq: {
+        idx: 0,
+        score: 0,
+        answered: new Array(getActiveMiniQuestions('extq').length).fill(null)
+      }
+    };
+
+    function renderMiniQuiz(prefix) {
+      const state = miniQuizBank[prefix];
+      const questions = getActiveMiniQuestions(prefix);
+      const total = questions.length;
+      if (!total) return;
+
+      state.idx = Math.max(0, Math.min(total - 1, state.idx));
+      const q = questions[state.idx];
+      const cleanPrompt = q.prompt.replace(/^\s*\d+\.\s*/, '');
+
+      document.getElementById(`${prefix}-counter`).textContent = `Question ${state.idx + 1} / ${total}`;
+      const badge = document.getElementById(`${prefix}-diff-badge`);
+      badge.textContent = q.level;
+      badge.className = `q-pill ${q.diffClass}`;
+      document.getElementById(`${prefix}-topic-tag`).textContent = q.topic;
+      document.getElementById(`${prefix}-score-display`).textContent = `Checkpoint Score: ${state.score} / ${total}`;
+      document.getElementById(`${prefix}-prompt`).innerHTML = `${state.idx + 1}. ${cleanPrompt}`;
+      document.getElementById(`${prefix}-svg`).innerHTML = q.svg;
+
+      const chosen = state.answered[state.idx];
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`${prefix}-opt-${i}`);
+        document.getElementById(`${prefix}-opt-text-${i}`).innerHTML = q.options[i];
+        btn.classList.remove('correct', 'wrong');
+        btn.disabled = (chosen !== null);
+        if (chosen !== null) {
+          if (i === q.correct) btn.classList.add('correct');
+          else if (i === chosen) btn.classList.add('wrong');
+        }
+      }
+
+      const fb = document.getElementById(`${prefix}-feedback`);
+      const fbText = document.getElementById(`${prefix}-feedback-text`);
+      const prevBtn = document.getElementById(`${prefix}-prev-btn`);
+      const nextBtn = document.getElementById(`${prefix}-next-btn`);
+
+      prevBtn.disabled = (state.idx === 0);
+
+      if (chosen === null) {
+        fb.className = 'quiz-feedback';
+        fbText.innerHTML = 'Select option <strong>A, B, C, or D</strong> above to check your understanding and view the step-by-step explanation.';
+        nextBtn.disabled = true;
+        nextBtn.textContent = state.idx === total - 1 ? 'Completed ✓' : 'Next →';
+      } else {
+        const isRight = (chosen === q.correct);
+        fb.className = `quiz-feedback ${isRight ? 'fb-correct' : 'fb-wrong'}`;
+        const tag = isRight ? '<strong>Correct!</strong> ' : '<strong>Not quite.</strong> ';
+        fbText.innerHTML = tag + q.explanation;
+        nextBtn.disabled = (state.idx === total - 1);
+        nextBtn.textContent = state.idx === total - 1 ? 'Done ✓' : 'Next →';
+      }
+    }
+
+    function selectMiniOption(prefix, optIdx) {
+      const state = miniQuizBank[prefix];
+      const questions = getActiveMiniQuestions(prefix);
+      if (state.answered[state.idx] !== null) return;
+      state.answered[state.idx] = optIdx;
+      if (optIdx === questions[state.idx].correct) {
+        state.score++;
+      }
+      renderMiniQuiz(prefix);
+    }
+
+    function stepMiniQuiz(prefix, dir) {
+      const state = miniQuizBank[prefix];
+      const total = getActiveMiniQuestions(prefix).length;
+      state.idx = Math.max(0, Math.min(total - 1, state.idx + dir));
+      renderMiniQuiz(prefix);
+    }
+
+    function resetMiniQuiz(prefix) {
+      const state = miniQuizBank[prefix];
+      const total = getActiveMiniQuestions(prefix).length;
+      state.idx = 0;
+      state.score = 0;
+      state.answered = new Array(total).fill(null);
+      renderMiniQuiz(prefix);
+    }
+
+    renderMiniQuiz('extq');
+
+    window.addEventListener('resize', fitToViewport);
+    fitToViewport();
+    SLIDE_CONFIGS.forEach((_, i) => renderSlide(i));
+    updateNavUI();
+    animate();
+  </script>
+</body>
+</html>
